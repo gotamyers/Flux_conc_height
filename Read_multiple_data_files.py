@@ -17,7 +17,8 @@ for k in range(11):
                 df_temp.append(row)
             df = df_temp[31:]
             data['SSA_' + str(k+1) + '_exp_' + str(i+1)] = np.array(df)
-
+data['SSA_2_exp_1'] = data['SSA_2_exp_1'][:,0:2]
+data['SSA_8_exp_1'] = data['SSA_8_exp_1'][:,0:2]
 #print(data)
 
 
