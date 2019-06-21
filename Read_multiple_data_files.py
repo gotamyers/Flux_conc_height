@@ -1,4 +1,5 @@
 import csv
+import math
 import time
 import numpy as np
 import matplotlib.pyplot as plt
@@ -33,7 +34,7 @@ data['SSA_8_exp_1'] = data['SSA_8_exp_1'][:, 0:2]
 
 
 Bmin_ref = np.zeros(11)
-
+SN_min = np.zeros(11)
 
 for k in range(11):
     SNR = []
@@ -41,9 +42,10 @@ for k in range(11):
     for row in range(751):
         c = float(data['SSA_' + str(k + 1) + '_exp_2'][row, 1]) - mean
         SNR.append(c)
-    data['SNR' + str(k + 1)] = np.array(SNR)
 
-    Bmin_ref[k] = np.divide(B,(np.sqrt(data['SNR' + str(k + 1)][370:440].max()*RBW)))
+    data['SNR' + str(k + 1)] = np.array(SNR)
+    SN_min = math.pow(10,(data['SNR' + str(k + 1)][370:440].max())/10)
+    Bmin_ref[k] = np.divide(B,(np.sqrt(SN_min*RBW)))
 
 
 
