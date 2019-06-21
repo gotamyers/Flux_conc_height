@@ -45,8 +45,9 @@ for k in range(11):
 
     data['SNR' + str(k + 1)] = np.array(SNR)
     SN_min = math.pow(10,(data['SNR' + str(k + 1)][370:440].max())/10)
-    Bmin_ref[k] = np.divide(B,(np.sqrt(SN_min*RBW)))
 
+    Bmin_ref[k] = np.divide(B,(np.sqrt(SN_min*RBW)))
+#print(Bmin_ref)
 
 
 for k in range(13):
@@ -82,11 +83,9 @@ for k in range(11):
         Bmin[j] = np.float(Bmin[j])
 
 
-
     data['Bmin'] = np.reshape(np.array(Bmin), (-1, 1))
 
     Bmin_min[k] = np.divide(data['Bmin'].min(), 1e-6)
-
 
 
 height = [30, 60, 90, 150, 210, 270, 470, 670, 1000, 2000, 2400]
