@@ -9,13 +9,13 @@ import matplotlib.ticker as mticker
 initial = time.time()
 
 B = 5e-4
-RBW = 300
+RBW = 30
 
 data = {}
 
 for k in range(11):
     for i in range(2):
-        with open('C:\\Users\uqfgotar\\Documents\\Magnetometry\\Sensitivity_calculations\\Fernando\\254_4\\25thJune_ZScan'
+        with open('C:\\Users\\uqfgotar\\Documents\\Magnetometry\\Sensitivity_calculations\\Fernando\\254_4\\25thJune_ZScan'
                   + '\\Spectrum_analyzer\\SSA_' + str("{:02d}".format(k+1)) + '_' + str(i) + '.csv') as a:
 
             df = csv.reader(a, delimiter=',')
@@ -37,15 +37,15 @@ SN_min = np.zeros(11)
 
 for k in range(11):
     SNR = []
-    mean = np.mean(data['SSA_' + str(k + 1) + '_exp_1'][370:440, 1])
+    mean = np.mean(data['SSA_' + str(k + 1) + '_exp_0'][370:440, 1])
     for row in range(751):
-        c = float(data['SSA_' + str(k + 1) + '_exp_2'][row, 1]) - mean
+        c = float(data['SSA_' + str(k + 1) + '_exp_1'][row, 1]) - mean
         SNR.append(c)
 
     data['SNR' + str(k + 1)] = np.array(SNR)
     SN_min = math.pow(10,(data['SNR' + str(k + 1)][370:440].max())/10)
 
-    Bmin_ref[k] = np.divide(B,(np.sqrt(SN_min*RBW)))
+    Bmin_ref[k] = np.divide(B, (np.sqrt(SN_min*RBW)))
 
 
 
@@ -68,12 +68,12 @@ for k in range(11):
 
 S21_Snn_ref_ratio = np.zeros(11)
 Bmin_min = np.zeros(11)
-for k in range(11):
+for k in range(10):
     Bmin = []
-    S21_Snn_ref_ratio[k] = data['TRACE' + str(k + 1)][8, 1]/data['TRACE13'][8, 1]
+    S21_Snn_ref_ratio[k] = data['TRACE' + str(k + 1)][376, 1]/data['TRACE11'][376, 1]
 
     for row in range(751):
-        c = np.multiply(np.sqrt(np.multiply(np.divide(data['TRACE13'][row, 1],
+        c = np.multiply(np.sqrt(np.multiply(np.divide(data['TRACE11'][row, 1],
                         data['TRACE' + str(k + 1)][row, 1]), S21_Snn_ref_ratio[k])), Bmin_ref[k])
         Bmin.append(c)
 
@@ -93,11 +93,11 @@ axes = plt.gca()
 xmin = data['TRACE1'][:, 0].min()
 xmax = data['TRACE1'][:, 0].max()
 plt.figure(1)
-for k in range(11):
+for k in range(10):
     plt.plot(data['TRACE' + str(k + 1)][:,0], data['Bmin_omega' + str(k)], label='$\Delta$z = ' + str(height[k]))
 plt.xlabel('Frequency (MHz)')
 plt.ylabel('Sensitivity ($\mu$T/$\sqrt{Hz}$)')
-axes.set_xlim([(xmin-50000), 2000000])
+axes.set_xlim([(xmin-50000), xmax])
 
 
 plt.figure(2)
