@@ -30,8 +30,8 @@ for k in range(11):
             data['SSA_' + str(k + 1) + '_exp_' + str(i + 1)] = np.reshape(np.array(df), (-1, 2))
 
         data['SSA_' + str(k+1) + '_exp_' + str(i+1)] = np.array(df)
-data['SSA_2_exp_1'] = data['SSA_2_exp_1'][:, 0:2]
-data['SSA_8_exp_1'] = data['SSA_8_exp_1'][:, 0:2]
+# data['SSA_2_exp_1'] = data['SSA_2_exp_1'][:, 0:2]
+# data['SSA_8_exp_1'] = data['SSA_8_exp_1'][:, 0:2]
 
 
 Bmin_ref = np.zeros(11)
