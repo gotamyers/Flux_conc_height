@@ -3,6 +3,7 @@ import math
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.ticker as mticker
 
 initial = time.time()
@@ -47,7 +48,7 @@ for k in range(11):
     SN_min = math.pow(10,(data['SNR' + str(k + 1)][370:440].max())/10)
 
     Bmin_ref[k] = np.divide(B,(np.sqrt(SN_min*RBW)))
-#print(Bmin_ref)
+
 
 
 for k in range(13):
@@ -58,7 +59,6 @@ for k in range(13):
         df_temp = []
 
         for row in df:
-            #print(row)
             df_temp.append(row)
         df = df_temp[3:]
 
@@ -82,20 +82,31 @@ for k in range(11):
     for j in range(len(Bmin)):
         Bmin[j] = np.float(Bmin[j])
 
+    data['Bmin' + str(k)] = np.asarray(Bmin)
 
-    data['Bmin'] = np.reshape(np.array(Bmin), (-1, 1))
-
-    Bmin_min[k] = np.divide(data['Bmin'].min(), 1e-6)
-
+    data['Bmin_omega' + str(k)] = np.multiply(np.divide(data['Bmin' + str(k)], 1e-12), Bmin_ref[k])
+    print(data['Bmin_omega' + str(k)].shape)
+    Bmin_min[k] = np.divide(data['Bmin' + str(k)].min(), 1e-6)
 
 height = [30, 60, 90, 150, 210, 270, 470, 670, 1000, 2000, 2400]
 height = np.array(height)
 
+axes = plt.gca()
+xmin = data['TRACE1'][:, 0].min()
+xmax = data['TRACE1'][:, 0].max()
+plt.figure(1)
+for k in range(11):
+    plt.plot(data['TRACE' + str(k + 1)][:,0], data['Bmin_omega' + str(k)], label='$\Delta$z = ' + str(height[k]))
+plt.xlabel('Frequency (MHz)')
+plt.ylabel('Sensitivity ($\mu$T/$\sqrt{Hz}$)')
+axes.set_xlim([(xmin-50000), 2000000])
 
+
+plt.figure(2)
 plt.plot(height, Bmin_min, 'ro')
 plt.xscale('log')
 plt.xlabel(r'$\Delta$z ($\mu$m)')
-plt.ylabel('Minimal sensitivity ($\mu$T$/\sqrt{Hz}$)')
+plt.ylabel('Best sensitivity ($\mu$T/$\sqrt{Hz}$)')
 
 final = time.time()
 print('\n' + str(final - initial) + ' seconds')
