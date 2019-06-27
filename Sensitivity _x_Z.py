@@ -29,24 +29,28 @@ for k in range(11):
 
             data['SSA_' + str(k + 1) + '_exp_' + str(i)] = np.reshape(np.array(df), (-1, 2))
 
-        data['SSA_' + str(k+1) + '_exp_' + str(i)] = np.array(df)
+        data['SSA_' + str(k + 1) + '_exp_' + str(i)] = np.array(df)
 
 
 Bmin_ref = np.zeros(11)
 SN_min = np.zeros(11)
+peak = np.zeros(11)
+#ind_max = np.zeros(11)
 
 for k in range(11):
     SNR = []
-    mean = np.mean(data['SSA_' + str(k + 1) + '_exp_0'][370:440, 1])
+    mean = np.mean(data['SSA_' + str(k + 1) + '_exp_0'][350:440, 1])
     for row in range(751):
         c = float(data['SSA_' + str(k + 1) + '_exp_1'][row, 1]) - mean
         SNR.append(c)
 
     data['SNR' + str(k + 1)] = np.array(SNR)
-    SN_min = math.pow(10,(data['SNR' + str(k + 1)][370:440].max())/10)
-
+    peak[k] = (data['SNR' + str(k + 1)][350:440] + mean).max()
+    SN_min = math.pow(10, (data['SNR' + str(k + 1)][350:440].max())/10)
+    ind_max = np.where(data['SNR' + str(k + 1)] == peak[k])
     Bmin_ref[k] = np.divide(B, (np.sqrt(SN_min*RBW)))
-
+    data['SNR' + str(k + 1)] = np.power(10, np.divide(data['SNR' + str(k + 1)], 10))
+print(peak)
 
 
 for k in range(11):
@@ -68,9 +72,9 @@ for k in range(11):
 
 S21_Snn_ref_ratio = np.zeros(11)
 Bmin_min = np.zeros(11)
-for k in range(10):
+for k in range(11):
     Bmin = []
-    S21_Snn_ref_ratio[k] = data['TRACE' + str(k + 1)][376, 1]/data['TRACE11'][376, 1]
+    S21_Snn_ref_ratio[k] = data['TRACE' + str(k + 1)][375, 1]/data['TRACE11'][375, 1]
 
     for row in range(751):
         c = np.multiply(np.sqrt(np.multiply(np.divide(data['TRACE11'][row, 1],
@@ -84,27 +88,47 @@ for k in range(10):
 
     data['Bmin_omega' + str(k)] = np.multiply(np.divide(data['Bmin' + str(k)], 1e-12), Bmin_ref[k])
 
-    Bmin_min[k] = np.divide(data['Bmin' + str(k)].min(), 1e-6)
+    Bmin_min[k] = np.divide(data['Bmin' + str(k)].min(), 1e-9)
 
-height = [30, 60, 90, 150, 210, 270, 470, 670, 1000, 2000, 2400]
+'''Calculus following James matlab program'''
+# for k in range(11):
+#     data['TRACE' + str(k + 1)][:, 1] = np.power(10, np.divide(data['TRACE' + str(k + 1)][:, 1], 10))
+#     data['TRACE' + str(k + 1)][:, 1] = np.divide(data['TRACE' + str(k + 1)][:, 1], data['TRACE' + str(k + 1)][575, 1])
+#     data['SSA_' + str(k + 1) + '_exp_0'][:, 1] = np.power(10, np.divide(data['SSA_' + str(k + 1) + '_exp_0'][:, 1], 10))
+#     data['SSA_' + str(k + 1) + '_exp_0'][:, 1] = np.divide(data['SSA_' + str(k + 1) + '_exp_0'][:, 1], data['SSA_' + str(k + 1) + '_exp_0'][575, 1])
+#
+#     S21_Snn_ref_ratio[k] = data['TRACE' + str(k + 1)][375, 1] / data['TRACE11'][375, 1]
+#     # print(data['TRACE' + str(k + 1)][375, 1])
+#     # print(data['TRACE11'])
+#
+#     data['Bmin' + str(k + 1)] = np.divide(data['SSA_' + str(k + 1) + '_exp_0'][:, 1], data['TRACE' + str(k + 1)][:, 1])
+#     data['Bmin' + str(k + 1)] = np.multiply(data['Bmin' + str(k + 1)], S21_Snn_ref_ratio[k])*0.000234
+#     Bmin_min[k] = np.divide(data['Bmin' + str(k + 1)].min(), 1e-9)
+
+
+height = [20, 50, 80, 110, 140, 200, 260, 360, 500, 1000]
 height = np.array(height)
 
 axes = plt.gca()
 xmin = data['TRACE1'][:, 0].min()
 xmax = data['TRACE1'][:, 0].max()
+ymin = data['TRACE1'][:, 1].min()
+ymax = data['TRACE10'][:, 1].max()
 plt.figure(1)
-for k in range(10):
-    plt.plot(data['TRACE' + str(k + 1)][:,0], data['Bmin_omega' + str(k)], label='$\Delta$z = ' + str(height[k]))
-plt.xlabel('Frequency (MHz)')
-plt.ylabel('Sensitivity ($\mu$T/$\sqrt{Hz}$)')
-axes.set_xlim([(xmin-50000), xmax])
+for k in range(9):
+    plt.plot(data['TRACE' + str(k + 1)][:, 0], data['Bmin_omega' + str(k + 1)], label='$\Delta$z = ' + str(height[k]))
+    #plt.plot(data['TRACE' + str(k + 1)][:, 0], data['Bmin' + str(k + 1)], label='$\Delta$z = ' + str(height[k]))
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Sensitivity ($nT$/$\sqrt{Hz}$)')
+axes.set_xlim([(xmin-10000), xmax])
+#axes.set_ylim([(ymin), ymax])
 
 
 plt.figure(2)
-plt.plot(height, Bmin_min, 'ro')
-plt.xscale('log')
+plt.plot(height, Bmin_min[:10], 'ro')
+plt.yscale('log')
 plt.xlabel(r'$\Delta$z ($\mu$m)')
-plt.ylabel('Best sensitivity ($\mu$T/$\sqrt{Hz}$)')
+plt.ylabel('Best sensitivity ($nT$/$\sqrt{Hz}$)')
 
 final = time.time()
 print('\n' + str(final - initial) + ' seconds')
