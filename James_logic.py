@@ -92,7 +92,7 @@ xmin = data['TRACE1'][:, 0].min()
 xmax = data['TRACE1'][:, 0].max()
 
 plt.figure(1)
-for k in range(9):
+for k in range(10):
     plt.plot(np.multiply(data['TRACE' + str(k + 1)][:, 0], 1e-6), data['Bmin' + str(k + 1)], label='$\Delta$z = ' + str(height[k]))
 
 plt.xlabel('Frequency (MHz)')
@@ -102,6 +102,12 @@ axes.set_xlim([(0.1), 1])
 axes.set_ylim([10, 1e7])
 plt.legend(loc='upper left')
 
+'''Plot meshgrid graph'''
+plt.figure(2)
+
+x_mesh, z_mesh = np.meshgrid(np.multiply(data['TRACE1'][:, 0], 1e-6), height)
+plt.scatter(x_mesh, z_mesh)
+axes.set_xlim([(0.1), 1])
 
 plt.show()
 ########################################################################################################################
