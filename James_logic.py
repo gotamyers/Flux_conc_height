@@ -7,15 +7,26 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.ticker as mticker
 
 initial = time.time()
-
-B_ref = 2.34e-4
-RBW = 30
 data = {}
 
+'''Calculating helmholtz coil magnetic field'''
+mu0 = 4*math.pi*1e-7                                                                               #Magnetic permeability vacuum
+Ncoils = 10                                                                                        #Number of turns
+dwire = 0.8                                                                                        #Wires thickness
+radius = 0.03                                                                                      #Coil radius
+R = 50                                                                                             #Resistance (ohms)
+L = 2*mu0*radius*Ncoils*(math.log10(16*radius/dwire)- 2)                                           #Inductance
+nu_ref = 550*1e3                                                                                   #Func. gen. driving freq.
+V_drive = math.sqrt(27.3*50*math.pow(10, 0.8)*1e-3)                                                #Voltagem driven to the coil
+RBW = 30                                                                                           #Resolution bandwidth
+I_driven = V_drive/math.sqrt(math.pow(R, 2) + math.pow((nu_ref*2*math.pi), 2)*math.pow(L, 2))      #Coils current
+B_ref = math.pow(4.5, 1.5)*mu0*Ncoils*I_driven/radius
+
+########################################################################################################################
 '''Read Spectrum analyzer, find SNR and calculate S_NN in not dB'''
 for k in range(11):
     for i in range(2):
-        with open('C:\\Users\\uqfgotar\\Documents\\Magnetometry\\Sensitivity_calculations\\Fernando\\254_4\\25thJune_ZScan'
+        with open('C:\\Users\\uqfgotar\\Documents\\Magnetometry\\Sensitivity_calculations\\254_4\\25thJune_ZScan'
                   + '\\Spectrum_analyzer\\SSA_' + str("{:02d}".format(k+1)) + '_' + str(i) + '.csv') as a:
 
             df = csv.reader(a, delimiter=',')
@@ -38,7 +49,7 @@ for k in range(11):
 ########################################################################################################################
 '''Read Network analyzer and calculate S_21 in not dB'''
 for k in range(11):
-    with open('C:\\Users\\uqfgotar\\Documents\\Magnetometry\\Sensitivity_calculations\\Fernando\\254_4\\25thJune_ZScan'
+    with open('C:\\Users\\uqfgotar\\Documents\\Magnetometry\\Sensitivity_calculations\\254_4\\25thJune_ZScan'
               + '\\Network_analyzer\\TRACE' + str("{:02d}".format(k+1)) + '.csv') as a:
 
         df = csv.reader(a, delimiter=',')
